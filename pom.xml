@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.duoc</groupId>
+    <artifactId>arriendo-vehiculos</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>msclientes</module><module>msvehiculos</module><module>msreservas</module>
+        <module>mspagos</module><module>mssucursales</module><module>msempleados</module><module>msreportes</module>
+    </modules>
+</project>

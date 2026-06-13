@@ -1,44 +1,57 @@
 package com.duoc.msclientes.controller;
 
+import com.duoc.msclientes.dto.ClienteDTO;
+import com.duoc.msclientes.dto.ClienteRequestDTO;
+import com.duoc.msclientes.service.ClienteService;
 
 import com.duoc.msclientes.mapper.ClienteMapper;
-import com.duoc.msclientes.dto.ClienteRequestDTO;
-import com.duoc.msclientes.model.Cliente;
-import com.duoc.msclientes.service.ClienteService;
+import com.duoc.msclientes.repository.ClienteRepository;
+
+
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-
+import java.net.URI;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/v1/clientes")
+@RequiredArgsConstructor
 public class ClienteController {
-
-    @Autowired
-    private ClienteService service;
-
-    @Autowired
-    private ClienteMapper mapper;
+    private final ClienteService service;
+    private final ClienteRepository repository;
+    private final ClienteMapper mapper;
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> listar() {
-        return ResponseEntity.ok(service.obtenerTodos());
+    public ResponseEntity<List<ClienteDTO>> findAll() {
+        return ResponseEntity.ok(service.findAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ClienteDTO> findById(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
 
     @PostMapping
-    public ResponseEntity<Cliente>  crear(@Valid @RequestBody ClienteRequestDTO dto){
-    Cliente entidad = mapper.toEntity(dto);
-        return new ResponseEntity<>(service.guardar(entidad), HttpStatus.CREATED);
+    public ResponseEntity<ClienteDTO> create(@Valid @RequestBody ClienteRequestDTO dto) {
+        ClienteDTO created = service.save(dto);
+        return ResponseEntity.created(URI.create("/api/v1/clientes/" + created.getId())).body(created);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteDTO> update(@PathVariable Integer id, @Valid @RequestBody ClienteRequestDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ClienteDTO>> buscar(@RequestParam String email) {
+        return ResponseEntity.ok(repository.findByEmailContainingIgnoreCase(email).stream().map(mapper::toDTO).toList());
+    }
 }

@@ -1,37 +1,62 @@
 package com.duoc.msclientes.service;
 
-
+import com.duoc.msclientes.dto.ClienteDTO;
+import com.duoc.msclientes.dto.ClienteRequestDTO;
+import com.duoc.msclientes.exception.ResourceNotFoundException;
+import com.duoc.msclientes.mapper.ClienteMapper;
 import com.duoc.msclientes.model.Cliente;
 import com.duoc.msclientes.repository.ClienteRepository;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-
-
 @Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class ClienteService {
-    private static final Logger log = LoggerFactory.getLogger(ClienteService.class);
+    private final ClienteRepository repository;
+    private final ClienteMapper mapper;
 
-    @Autowired
-    private ClienteRepository repo;
-
-    public List<Cliente> obtenerTodos(){
-        log.info("Buscando todos los clientes en la base de datos");
-        return repo.findAll();
+    @Transactional(readOnly = true)
+    public List<ClienteDTO> findAll() {
+        log.info("Listando clientes");
+        return repository.findAll().stream().map(mapper::toDTO).toList();
     }
 
-    public Cliente guardar(Cliente cliente){
+    @Transactional(readOnly = true)
+    public ClienteDTO findById(Integer id) {
+        log.info("Buscando Cliente con id {}", id);
+        return mapper.toDTO(getEntity(id));
+    }
+
+    public ClienteDTO save(ClienteRequestDTO dto) {
         try {
-            log.info("Intentando guardar cliente: {}", cliente.getNombre());
-            return  repo.save(cliente);
-        }   catch (Exception e) {
-            log.error("Error al guardar:{}",e.getMessage());
-            throw e;
+            Cliente saved = repository.save(mapper.toEntity(dto));
+            log.info("Cliente creado con id {}", saved.getId());
+            return mapper.toDTO(saved);
+        } catch (RuntimeException ex) {
+            log.error("Error al crear Cliente: {}", ex.getMessage());
+            throw ex;
         }
     }
 
+    public ClienteDTO update(Integer id, ClienteRequestDTO dto) {
+        Cliente entity = getEntity(id);
+        mapper.update(entity, dto);
+        return mapper.toDTO(repository.save(entity));
+    }
+
+    public void delete(Integer id) {
+        repository.delete(getEntity(id));
+        log.info("Cliente eliminado con id {}", id);
+    }
+
+    private Cliente getEntity(Integer id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente", id));
+    }
 }

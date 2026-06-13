@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: michel
+      changes:
+        - createTable:
+            tableName: reportes
+            columns:
+              - column: { name: id, type: INT, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: nombre, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: tipo, type: VARCHAR(40), constraints: { nullable: false } }
+              - column: { name: descripcion, type: VARCHAR(250), constraints: { nullable: false } }
+              - column: { name: total_reservas, type: INT, constraints: { nullable: false } }
+              - column: { name: monto_total_pagos, type: DECIMAL(14,2), constraints: { nullable: false } }
+              - column: { name: generado, type: BOOLEAN, constraints: { nullable: false } }
+              - column: { name: fecha_generacion, type: DATETIME, constraints: { nullable: false } }
+        - insert:
+            tableName: reportes
+            columns:
+              - column: { name: nombre, value: "Reporte inicial" }
+              - column: { name: tipo, value: "CONSOLIDADO" }
+              - column: { name: descripcion, value: "Carga inicial Liquibase" }
+              - column: { name: total_reservas, valueNumeric: 3 }
+              - column: { name: monto_total_pagos, valueNumeric: 450000 }
+              - column: { name: generado, valueBoolean: true }
+              - column: { name: fecha_generacion, valueDate: "2026-01-01T10:00:00" }
+        - insert:
+            tableName: reportes
+            columns:
+              - column: { name: nombre, value: "Reporte pagos" }
+              - column: { name: tipo, value: "PAGOS" }
+              - column: { name: descripcion, value: "Resumen de pagos procesados" }
+              - column: { name: total_reservas, valueNumeric: 2 }
+              - column: { name: monto_total_pagos, valueNumeric: 360000 }
+              - column: { name: generado, valueBoolean: true }
+              - column: { name: fecha_generacion, valueDate: "2026-01-02T10:00:00" }
+        - insert:
+            tableName: reportes
+            columns:
+              - column: { name: nombre, value: "Reporte reservas" }
+              - column: { name: tipo, value: "RESERVAS" }
+              - column: { name: descripcion, value: "Resumen de reservas vigentes" }
+              - column: { name: total_reservas, valueNumeric: 3 }
+              - column: { name: monto_total_pagos, valueNumeric: 0 }
+              - column: { name: generado, valueBoolean: true }
+              - column: { name: fecha_generacion, valueDate: "2026-01-03T10:00:00" }

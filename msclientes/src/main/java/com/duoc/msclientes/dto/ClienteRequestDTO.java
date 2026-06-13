@@ -1,46 +1,40 @@
 package com.duoc.msclientes.dto;
 
 import jakarta.validation.constraints.*;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class ClienteRequestDTO {
-
-    @NotBlank(message = "El nombre no puede estar vacio")
+    @NotBlank
+    @Size(min = 2, max = 80)
     private String nombre;
 
-    @Email(message = "Formato de email invalido")
     @NotBlank
+    @Size(min = 2, max = 80)
+    private String apellido;
+
+    @NotBlank
+    @Email
+    @Size(max = 120)
     private String email;
 
-
-    @Min(value = 18, message = "Debe ser mayor de edad")
-    private Integer edad;
+    @NotBlank
+    @Size(min = 8, max = 20)
+    private String telefono;
 
     @NotNull
+    @Min(18)
+    private Integer edad;
+
     private boolean esVip;
 
+    @NotNull
     @PastOrPresent
     private LocalDate fechaAlta;
 
-
-    public LocalDate getFechaAlta() {
-        return fechaAlta;
-    }
-
-    public boolean getEsVip() {
-        return esVip;
-    }
-
-    public Integer getEdad() {
-        return edad;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
 }
