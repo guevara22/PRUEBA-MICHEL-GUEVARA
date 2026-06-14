@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -63,6 +64,14 @@ public class ReservaService {
     public void delete(Integer id) {
         repository.delete(getEntity(id));
         log.info("Reserva eliminada con id {}", id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservaDTO> buscarDesdeFecha(LocalDate fechaDesde) {
+        log.info("Buscando reservas desde {}", fechaDesde);
+        return repository.buscarDesdeFecha(fechaDesde).stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     private void validarDatosRemotos(ReservaRequestDTO dto) {

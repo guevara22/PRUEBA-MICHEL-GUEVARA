@@ -3,9 +3,6 @@ package com.duoc.mspagos.controller;
 import com.duoc.mspagos.dto.PagoDTO;
 import com.duoc.mspagos.dto.PagoRequestDTO;
 import com.duoc.mspagos.service.PagoService;
-
-import com.duoc.mspagos.mapper.PagoMapper;
-import com.duoc.mspagos.repository.PagoRepository;
 import java.math.BigDecimal;
 
 import jakarta.validation.Valid;
@@ -20,8 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PagoController {
     private final PagoService service;
-    private final PagoRepository repository;
-    private final PagoMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<PagoDTO>> findAll() {
@@ -52,6 +47,6 @@ public class PagoController {
 
     @GetMapping("/buscar")
     public ResponseEntity<List<PagoDTO>> buscar(@RequestParam BigDecimal montoMin, @RequestParam BigDecimal montoMax) {
-        return ResponseEntity.ok(repository.buscarPorRango(montoMin, montoMax).stream().map(mapper::toDTO).toList());
+        return ResponseEntity.ok(service.buscarPorRango(montoMin, montoMax));
     }
 }

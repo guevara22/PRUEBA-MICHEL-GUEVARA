@@ -61,6 +61,14 @@ public class VehiculoService {
         log.info("Vehiculo eliminado con id {}", id);
     }
 
+    @Transactional(readOnly = true)
+    public List<VehiculoDTO> buscarDisponibles(java.math.BigDecimal precioMaximo) {
+        log.info("Buscando vehiculos disponibles con precio maximo {}", precioMaximo);
+        return repository.findByDisponibleTrueAndPrecioArriendoDiarioLessThan(precioMaximo).stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
     private Vehiculo getEntity(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehiculo", id));

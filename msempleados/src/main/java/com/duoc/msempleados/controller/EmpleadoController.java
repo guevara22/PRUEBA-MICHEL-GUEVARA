@@ -3,11 +3,6 @@ package com.duoc.msempleados.controller;
 import com.duoc.msempleados.dto.EmpleadoDTO;
 import com.duoc.msempleados.dto.EmpleadoRequestDTO;
 import com.duoc.msempleados.service.EmpleadoService;
-
-import com.duoc.msempleados.mapper.EmpleadoMapper;
-import com.duoc.msempleados.repository.EmpleadoRepository;
-
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmpleadoController {
     private final EmpleadoService service;
-    private final EmpleadoRepository repository;
-    private final EmpleadoMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<EmpleadoDTO>> findAll() {
@@ -52,6 +45,6 @@ public class EmpleadoController {
 
     @GetMapping("/activos")
     public ResponseEntity<List<EmpleadoDTO>> activosPorAnio(@RequestParam int anio) {
-        return ResponseEntity.ok(repository.buscarActivosPorAnio(anio).stream().map(mapper::toDTO).toList());
+        return ResponseEntity.ok(service.buscarActivosPorAnio(anio));
     }
 }

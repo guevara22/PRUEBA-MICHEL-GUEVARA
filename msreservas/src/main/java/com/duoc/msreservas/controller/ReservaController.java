@@ -3,10 +3,6 @@ package com.duoc.msreservas.controller;
 import com.duoc.msreservas.dto.ReservaDTO;
 import com.duoc.msreservas.dto.ReservaRequestDTO;
 import com.duoc.msreservas.service.ReservaService;
-
-import com.duoc.msreservas.mapper.ReservaMapper;
-import com.duoc.msreservas.repository.ReservaRepository;
-
 import java.time.LocalDate;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservaController {
     private final ReservaService service;
-    private final ReservaRepository repository;
-    private final ReservaMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<ReservaDTO>> findAll() {
@@ -52,6 +46,6 @@ public class ReservaController {
 
     @GetMapping("/buscar")
     public ResponseEntity<List<ReservaDTO>> buscar(@RequestParam LocalDate fechaDesde) {
-        return ResponseEntity.ok(repository.buscarDesdeFecha(fechaDesde).stream().map(mapper::toDTO).toList());
+        return ResponseEntity.ok(service.buscarDesdeFecha(fechaDesde));
     }
 }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -57,6 +58,17 @@ public class PagoService {
     public void delete(Integer id) {
         repository.delete(getEntity(id));
         log.info("Pago eliminado con id {}", id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PagoDTO> buscarPorRango(BigDecimal montoMin, BigDecimal montoMax) {
+        if (montoMin.compareTo(montoMax) > 0) {
+            throw new IllegalArgumentException("El monto minimo no puede superar el monto maximo");
+        }
+        log.info("Buscando pagos entre {} y {}", montoMin, montoMax);
+        return repository.buscarPorRango(montoMin, montoMax).stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     private void validarReserva(PagoRequestDTO dto) {

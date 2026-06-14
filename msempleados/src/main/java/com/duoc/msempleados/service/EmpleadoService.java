@@ -55,6 +55,14 @@ public class EmpleadoService {
         log.info("Empleado eliminado con id {}", id);
     }
 
+    @Transactional(readOnly = true)
+    public List<EmpleadoDTO> buscarActivosPorAnio(int anio) {
+        log.info("Buscando empleados activos contratados desde {}", anio);
+        return repository.buscarActivosPorAnio(anio).stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
     private Empleado getEntity(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empleado", id));

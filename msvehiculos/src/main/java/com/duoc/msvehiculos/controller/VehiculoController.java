@@ -3,9 +3,6 @@ package com.duoc.msvehiculos.controller;
 import com.duoc.msvehiculos.dto.VehiculoDTO;
 import com.duoc.msvehiculos.dto.VehiculoRequestDTO;
 import com.duoc.msvehiculos.service.VehiculoService;
-
-import com.duoc.msvehiculos.mapper.VehiculoMapper;
-import com.duoc.msvehiculos.repository.VehiculoRepository;
 import java.math.BigDecimal;
 
 import jakarta.validation.Valid;
@@ -20,8 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VehiculoController {
     private final VehiculoService service;
-    private final VehiculoRepository repository;
-    private final VehiculoMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<VehiculoDTO>> findAll() {
@@ -52,6 +47,6 @@ public class VehiculoController {
 
     @GetMapping("/buscar")
     public ResponseEntity<List<VehiculoDTO>> buscar(@RequestParam BigDecimal precioMaximo) {
-        return ResponseEntity.ok(repository.findByDisponibleTrueAndPrecioArriendoDiarioLessThan(precioMaximo).stream().map(mapper::toDTO).toList());
+        return ResponseEntity.ok(service.buscarDisponibles(precioMaximo));
     }
 }

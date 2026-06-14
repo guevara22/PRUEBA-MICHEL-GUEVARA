@@ -55,6 +55,14 @@ public class ClienteService {
         log.info("Cliente eliminado con id {}", id);
     }
 
+    @Transactional(readOnly = true)
+    public List<ClienteDTO> buscarPorEmail(String email) {
+        log.info("Buscando clientes por email {}", email);
+        return repository.findByEmailContainingIgnoreCase(email).stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
     private Cliente getEntity(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente", id));

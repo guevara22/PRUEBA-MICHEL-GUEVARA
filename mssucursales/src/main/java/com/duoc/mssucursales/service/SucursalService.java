@@ -61,6 +61,14 @@ public class SucursalService {
         log.info("Sucursal eliminado con id {}", id);
     }
 
+    @Transactional(readOnly = true)
+    public List<SucursalDTO> buscarOperativas() {
+        log.info("Buscando sucursales operativas");
+        return repository.buscarOperativas().stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
+
     private Sucursal getEntity(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Sucursal", id));

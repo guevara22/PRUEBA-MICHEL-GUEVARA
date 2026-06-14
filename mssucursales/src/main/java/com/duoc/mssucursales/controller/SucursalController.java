@@ -3,11 +3,6 @@ package com.duoc.mssucursales.controller;
 import com.duoc.mssucursales.dto.SucursalDTO;
 import com.duoc.mssucursales.dto.SucursalRequestDTO;
 import com.duoc.mssucursales.service.SucursalService;
-
-import com.duoc.mssucursales.mapper.SucursalMapper;
-import com.duoc.mssucursales.repository.SucursalRepository;
-
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SucursalController {
     private final SucursalService service;
-    private final SucursalRepository repository;
-    private final SucursalMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<SucursalDTO>> findAll() {
@@ -52,6 +45,6 @@ public class SucursalController {
 
     @GetMapping("/operativas")
     public ResponseEntity<List<SucursalDTO>> operativas() {
-        return ResponseEntity.ok(repository.buscarOperativas().stream().map(mapper::toDTO).toList());
+        return ResponseEntity.ok(service.buscarOperativas());
     }
 }

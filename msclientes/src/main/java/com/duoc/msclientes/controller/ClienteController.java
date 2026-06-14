@@ -3,11 +3,6 @@ package com.duoc.msclientes.controller;
 import com.duoc.msclientes.dto.ClienteDTO;
 import com.duoc.msclientes.dto.ClienteRequestDTO;
 import com.duoc.msclientes.service.ClienteService;
-
-import com.duoc.msclientes.mapper.ClienteMapper;
-import com.duoc.msclientes.repository.ClienteRepository;
-
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClienteController {
     private final ClienteService service;
-    private final ClienteRepository repository;
-    private final ClienteMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<ClienteDTO>> findAll() {
@@ -52,6 +45,6 @@ public class ClienteController {
 
     @GetMapping("/buscar")
     public ResponseEntity<List<ClienteDTO>> buscar(@RequestParam String email) {
-        return ResponseEntity.ok(repository.findByEmailContainingIgnoreCase(email).stream().map(mapper::toDTO).toList());
+        return ResponseEntity.ok(service.buscarPorEmail(email));
     }
 }
