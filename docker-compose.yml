@@ -1,0 +1,119 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-duoc123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-duoc123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  eureka-server:
+    build: ./eureka-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8761/actuator/health | grep UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  msclientes:
+    build: ./msclientes
+    depends_on: &service-depends
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment: &service-env
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-duoc123}
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      DB_URL: jdbc:mysql://mysql:3306/prueba1?serverTimezone=America/Santiago
+    ports:
+      - "8081:8081"
+
+  msvehiculos:
+    build: ./msvehiculos
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-duoc123}
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      DB_URL: jdbc:mysql://mysql:3306/prueba1?serverTimezone=America/Santiago
+    depends_on: *service-depends
+    ports:
+      - "8082:8082"
+
+  msreservas:
+    build: ./msreservas
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-duoc123}
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      DB_URL: jdbc:mysql://mysql:3306/prueba2?serverTimezone=America/Santiago
+    depends_on: *service-depends
+    ports:
+      - "8083:8083"
+
+  mspagos:
+    build: ./mspagos
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-duoc123}
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      DB_URL: jdbc:mysql://mysql:3306/prueba3?serverTimezone=America/Santiago
+    depends_on: *service-depends
+    ports:
+      - "8084:8084"
+
+  mssucursales:
+    build: ./mssucursales
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-duoc123}
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      DB_URL: jdbc:mysql://mysql:3306/prueba1?serverTimezone=America/Santiago
+    depends_on: *service-depends
+    ports:
+      - "8085:8085"
+
+  msempleados:
+    build: ./msempleados
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-duoc123}
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      DB_URL: jdbc:mysql://mysql:3306/prueba1?serverTimezone=America/Santiago
+    depends_on: *service-depends
+    ports:
+      - "8086:8086"
+
+  msreportes:
+    build: ./msreportes
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-duoc123}
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      DB_URL: jdbc:mysql://mysql:3306/prueba4?serverTimezone=America/Santiago
+    depends_on: *service-depends
+    ports:
+      - "8087:8087"
+
+  api-gateway:
+    build: ./api-gateway
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql-data:

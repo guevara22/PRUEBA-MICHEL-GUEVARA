@@ -1,65 +1,97 @@
 # Sistema de arriendo de vehiculos
 
-Evaluacion Parcial 2 de DSY1103 - Desarrollo FullStack I.
+Evaluacion de DSY1103 desarrollada individualmente por **Michel Guevara**.
 
-**Estudiante:** Michel Guevara
-
-Proyecto individual compuesto por siete microservicios Spring Boot para administrar
-clientes, vehiculos, reservas, pagos, sucursales, empleados y reportes.
+El proyecto implementa una arquitectura de siete microservicios Spring Boot,
+Eureka Server y API Gateway. La evaluacion individual se concentra en las
+entidades `Reserva`, `EstadoReserva` y `Pago`.
 
 ## Arquitectura
 
-Cada servicio aplica separacion por capas:
+| Componente | Puerto | Responsabilidad |
+| --- | ---: | --- |
+| API Gateway | 8080 | Punto unico de entrada y balanceo |
+| Eureka Server | 8761 | Registro y descubrimiento |
+| CLIENTES-SERVICE | 8081 | Clientes y direcciones |
+| VEHICULOS-SERVICE | 8082 | Vehiculos y categorias |
+| RESERVAS-SERVICE | 8083 | Reservas y estados |
+| PAGOS-SERVICE | 8084 | Pagos de reservas |
+| SUCURSALES-SERVICE | 8085 | Sucursales y regiones |
+| EMPLEADOS-SERVICE | 8086 | Empleados |
+| REPORTES-SERVICE | 8087 | Reportes consolidados |
 
-- `controller`: endpoints REST y respuestas HTTP.
-- `service`: reglas de negocio, logs y transacciones.
-- `repository`: persistencia con Spring Data JPA.
-- `model`: entidades JPA y relaciones.
-- `dto` y `mapper`: intercambio de datos sin exponer entidades.
-- `exception`: manejo centralizado mediante `@ControllerAdvice`.
+Todos los servicios usan Controller, Service, Repository, DTO, Mapper,
+validaciones, excepciones centralizadas, logs y configuracion YAML.
 
-| Microservicio | Puerto | Base de datos | Responsabilidad |
-| --- | ---: | --- | --- |
-| msclientes | 8081 | prueba1 | Clientes y direcciones |
-| msvehiculos | 8082 | prueba1 | Vehiculos y categorias |
-| msreservas | 8083 | prueba2 | Reservas y estados |
-| mspagos | 8084 | prueba3 | Pagos asociados a reservas |
-| mssucursales | 8085 | prueba1 | Sucursales y regiones |
-| msempleados | 8086 | prueba1 | Empleados de sucursales |
-| msreportes | 8087 | prueba4 | Reportes consolidados |
+## Requisitos incorporados
 
-## Funcionalidades
+- Eureka Server y clientes registrados por nombre.
+- API Gateway reactivo con rutas `lb://`, predicados y filtros.
+- Comunicacion REST con OpenFeign, LoadBalancer y timeouts.
+- Swagger/OpenAPI en los siete microservicios.
+- HATEOAS en Reserva, EstadoReserva y Pago.
+- Pruebas JUnit 5 y Mockito con estructura Given-When-Then.
+- Reportes de cobertura JaCoCo.
+- Flyway para reservas y pagos; Liquibase para reportes.
+- Dockerfiles y Docker Compose para despliegue local.
+- Variables de entorno para puertos, base de datos y Eureka.
 
-- CRUD completo mediante `GET`, `POST`, `PUT` y `DELETE`.
-- Persistencia MySQL con JPA e Hibernate.
-- Relaciones `OneToMany` y `ManyToOne`.
-- DTOs con Bean Validation.
-- Respuestas JSON mediante `ResponseEntity`.
-- Excepciones centralizadas y codigos HTTP controlados.
-- Logs de operaciones con SLF4J.
-- Migraciones Flyway en reservas y pagos, y Liquibase en reportes.
-- Comunicacion Feign: reservas consulta clientes y vehiculos; pagos consulta
-  reservas; reportes consulta reservas y pagos.
-- Timeouts configurados para las comunicaciones remotas.
+## Rutas del Gateway
 
-## Ejecucion
+Todas las llamadas funcionales se pueden realizar desde `http://localhost:8080`.
 
-Requisitos:
+| Servicio | Rutas |
+| --- | --- |
+| Clientes | `/api/v1/clientes/**`, `/api/v1/direcciones/**` |
+| Vehiculos | `/api/v1/vehiculos/**`, `/api/v1/categorias/**` |
+| Reservas | `/api/v1/reservas/**`, `/api/v1/estados-reserva/**` |
+| Pagos | `/api/v1/pagos/**` |
+| Sucursales | `/api/v1/sucursales/**`, `/api/v1/regiones/**` |
+| Empleados | `/api/v1/empleados/**` |
+| Reportes | `/api/v1/reportes/**` |
 
-- Java 17
-- MySQL 8
-- Puertos 8081 a 8087 disponibles
+El filtro del Gateway agrega la cabecera `X-Gateway: API-GATEWAY`.
 
-Configura las credenciales de MySQL:
+## Ejecucion con Docker
+
+Requisito: Docker Desktop iniciado.
+
+```bash
+docker compose up --build
+```
+
+Para detener el sistema:
+
+```bash
+docker compose down
+```
+
+Para reiniciar tambien los datos:
+
+```bash
+docker compose down -v
+```
+
+La clave MySQL predeterminada para Docker es `duoc123`. Se puede reemplazar:
+
+```bash
+DB_PASSWORD=otra_clave docker compose up --build
+```
+
+## Ejecucion sin Docker
+
+Requisitos: Java 17 y MySQL 8. Primero se crean las bases `prueba1`,
+`prueba2`, `prueba3` y `prueba4`.
 
 ```bash
 export DB_USER=root
 export DB_PASSWORD=tu_clave_mysql
 ```
 
-Ejecuta primero los servicios base y luego los que dependen de ellos:
+Iniciar en este orden, cada componente en una terminal:
 
 ```bash
+cd eureka-server && ../msreservas/mvnw spring-boot:run
 cd msclientes && ./mvnw spring-boot:run
 cd msvehiculos && ./mvnw spring-boot:run
 cd mssucursales && ./mvnw spring-boot:run
@@ -67,21 +99,52 @@ cd msempleados && ./mvnw spring-boot:run
 cd msreservas && ./mvnw spring-boot:run
 cd mspagos && ./mvnw spring-boot:run
 cd msreportes && ./mvnw spring-boot:run
+cd api-gateway && ../msreservas/mvnw spring-boot:run
 ```
 
-Cada comando debe ejecutarse en una terminal distinta desde la raiz del proyecto.
+## Swagger y Eureka
 
-## Endpoints principales
+- Eureka: `http://localhost:8761`
+- Reservas Swagger: `http://localhost:8083/swagger-ui.html`
+- Pagos Swagger: `http://localhost:8084/swagger-ui.html`
+- Los demas servicios usan la misma ruta Swagger en su puerto.
 
-Todos los recursos usan la ruta `/api/v1`:
+Ejemplo HATEOAS:
 
-- `/clientes` y `/clientes/buscar?email=...`
-- `/vehiculos` y `/vehiculos/buscar?precioMaximo=...`
-- `/reservas` y `/reservas/buscar?fechaDesde=AAAA-MM-DD`
-- `/pagos` y `/pagos/buscar?montoMin=...&montoMax=...`
-- `/sucursales` y `/sucursales/operativas`
-- `/empleados` y `/empleados/activos?anio=...`
-- `/reportes`
+```bash
+curl http://localhost:8080/api/v1/reservas/1
+```
 
-Para probar un CRUD, agrega el identificador al final de la ruta para consultar,
-actualizar o eliminar un registro, por ejemplo `/api/v1/clientes/1`.
+La respuesta incluye `_links` para el recurso, la coleccion y su estado.
+
+## Pruebas y cobertura
+
+```bash
+cd msreservas && ./mvnw clean test
+cd mspagos && ./mvnw clean test
+```
+
+Reportes:
+
+- `msreservas/target/site/jacoco/index.html`
+- `mspagos/target/site/jacoco/index.html`
+
+Las pruebas unitarias cubren CRUD, busquedas y reglas de negocio:
+
+- fecha final posterior a la inicial;
+- existencia del estado de reserva;
+- disponibilidad remota del vehiculo;
+- validacion remota de la reserva;
+- pago no superior al monto total;
+- rango de montos valido.
+
+## Defensa
+
+Flujo recomendado para demostrar:
+
+1. Abrir Eureka y mostrar los siete servicios y el Gateway registrados.
+2. Abrir Swagger de reservas y pagos.
+3. Consultar Reserva, EstadoReserva y Pago y mostrar `_links`.
+4. Ejecutar una llamada por `localhost:8080` y mostrar `X-Gateway`.
+5. Explicar Feign, los timeouts y las rutas `lb://`.
+6. Ejecutar las pruebas y abrir el reporte JaCoCo.
