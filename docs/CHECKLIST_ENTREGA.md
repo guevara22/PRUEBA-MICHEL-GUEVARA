@@ -15,8 +15,11 @@
 - [x] Reporte de cobertura JaCoCo.
 - [x] Flyway y Liquibase.
 - [x] Dockerfiles y Docker Compose.
+- [x] Perfil remoto mediante `application-remote.yml`.
+- [x] MySQL y `msreservas` desplegados en Railway.
+- [x] URL publica de Swagger y endpoint remoto con respuesta `200 OK`.
 - [x] README con arquitectura, ejecucion, rutas y defensa.
 - [x] Repositorio Git con commits descriptivos.
 
-Pendiente externo: el despliegue remoto requiere conectar este repositorio a
-una cuenta de Render, Railway u otra plataforma indicada por el profesor.
+Despliegue remoto:
+`https://prueba-michel-guevara-production.up.railway.app/swagger-ui.html`

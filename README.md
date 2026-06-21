@@ -35,6 +35,7 @@ validaciones, excepciones centralizadas, logs y configuracion YAML.
 - Flyway para reservas y pagos; Liquibase para reportes.
 - Dockerfiles y Docker Compose para despliegue local.
 - Variables de entorno para puertos, base de datos y Eureka.
+- Perfil `remote` y despliegue publico de `msreservas` en Railway.
 
 ## Rutas del Gateway
 
@@ -108,6 +109,10 @@ cd api-gateway && ../msreservas/mvnw spring-boot:run
 - Reservas Swagger: `http://localhost:8083/swagger-ui.html`
 - Pagos Swagger: `http://localhost:8084/swagger-ui.html`
 - Los demas servicios usan la misma ruta Swagger en su puerto.
+- Reservas Swagger remoto:
+  `https://prueba-michel-guevara-production.up.railway.app/swagger-ui.html`
+- Salud del servicio remoto:
+  `https://prueba-michel-guevara-production.up.railway.app/actuator/health`
 
 Ejemplo HATEOAS:
 
@@ -116,6 +121,33 @@ curl http://localhost:8080/api/v1/reservas/1
 ```
 
 La respuesta incluye `_links` para el recurso, la coleccion y su estado.
+
+## Despliegue remoto en Railway
+
+El microservicio `msreservas` esta desplegado junto con una base MySQL en
+Railway. El servicio se construye desde `msreservas/Dockerfile` usando
+`/msreservas` como directorio raiz.
+
+Variables configuradas en Railway:
+
+```text
+SPRING_PROFILES_ACTIVE=remote
+DB_URL=jdbc:mysql://<host>:<puerto>/<base>
+DB_USER=<usuario>
+DB_PASSWORD=<clave>
+SERVER_PORT=8083
+```
+
+Comprobacion remota:
+
+```bash
+curl https://prueba-michel-guevara-production.up.railway.app/actuator/health
+curl https://prueba-michel-guevara-production.up.railway.app/api/v1/estados-reserva/1
+```
+
+El perfil `remote` usa variables de entorno, desactiva el registro en Eureka
+para este despliegue individual y reconoce las cabeceras HTTPS del proxy de
+Railway. Los demas microservicios se ejecutan localmente con Docker Compose.
 
 ## Pruebas y cobertura
 
@@ -148,3 +180,4 @@ Flujo recomendado para demostrar:
 4. Ejecutar una llamada por `localhost:8080` y mostrar `X-Gateway`.
 5. Explicar Feign, los timeouts y las rutas `lb://`.
 6. Ejecutar las pruebas y abrir el reporte JaCoCo.
+7. Abrir Swagger remoto y demostrar una respuesta `200 OK`.
