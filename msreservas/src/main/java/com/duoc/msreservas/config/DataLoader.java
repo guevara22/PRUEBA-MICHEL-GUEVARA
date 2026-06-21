@@ -7,22 +7,42 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
-import java.util.List;
-
 @Configuration
 public class DataLoader {
 
     @Bean
     CommandLineRunner cargarEstadosReserva(EstadoReservaRepository repository) {
         return args -> {
-            if (repository.count() == 0) {
-                repository.saveAll(List.of(
-                        crearEstado("PENDIENTE", "Reserva pendiente de confirmacion", 1, true),
-                        crearEstado("CONFIRMADA", "Reserva confirmada y vigente", 2, true),
-                        crearEstado("FINALIZADA", "Reserva completada correctamente", 3, false)
-                ));
-            }
+            crearSiNoExiste(
+                    repository,
+                    "PENDIENTE",
+                    "Reserva pendiente de confirmacion",
+                    1,
+                    true);
+            crearSiNoExiste(
+                    repository,
+                    "CONFIRMADA",
+                    "Reserva confirmada y vigente",
+                    2,
+                    true);
+            crearSiNoExiste(
+                    repository,
+                    "FINALIZADA",
+                    "Reserva completada correctamente",
+                    3,
+                    false);
         };
+    }
+
+    private void crearSiNoExiste(
+            EstadoReservaRepository repository,
+            String nombre,
+            String descripcion,
+            int prioridad,
+            boolean permiteModificacion) {
+        if (!repository.existsByNombreIgnoreCase(nombre)) {
+            repository.save(crearEstado(nombre, descripcion, prioridad, permiteModificacion));
+        }
     }
 
     private EstadoReserva crearEstado(

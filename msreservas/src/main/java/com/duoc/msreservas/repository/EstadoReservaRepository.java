@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface EstadoReservaRepository extends JpaRepository<EstadoReserva, Integer> {
+    boolean existsByNombreIgnoreCase(String nombre);
 }
