@@ -6,6 +6,8 @@ spring:
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+  flyway:
+    baseline-on-migrate: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,4 +15,3 @@ spring:
 eureka:
   client:
     enabled: false
-
